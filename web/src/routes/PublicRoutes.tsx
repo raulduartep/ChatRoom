@@ -7,7 +7,7 @@ const routes: React.FC = () => {
   return (
     <React.Fragment>
       <Route path='/' exact component={LoginPage}/>
-      <Route path='/chat' component={ChatPage} />
+      <Route path='/chat/:user' component={ChatPage} />
     </React.Fragment>
   );
 }

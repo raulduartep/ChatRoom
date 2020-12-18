@@ -8,8 +8,8 @@
     "rootDir": "./src",
     "removeComments": true,
     "typeRoots": [
+      "./src/@types",
       "./node_modules/@types",
-      "./src/@types"
     ],
     "esModuleInterop": true,
     "resolveJsonModule": true,

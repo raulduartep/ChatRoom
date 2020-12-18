@@ -1,4 +1,7 @@
-import React, { FormEvent, KeyboardEvent, useState } from 'react';
+import React, { FormEvent, KeyboardEvent, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+import useChat from '../../hooks/useChat';
 
 import {
   Container,
@@ -10,17 +13,16 @@ import {
   UserInputForm
 } from './styles';
 
-interface Message {
-  author: string;
-  message: string;
+interface ChatParams {
+  user: string;
 }
+
 
 const Chat: React.FC = () => {
 
-  const username = localStorage.getItem('ChatRoom@username');
+  const { user: userParam } = useParams<ChatParams>()
 
-  const [users, setUsers] = useState([]);
-  const [messages, setMessages] = useState<Array<Message>>([]);
+  const { messages, sendMessage, users } = useChat(userParam);
   const [input, setInput] = useState('');
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
@@ -35,16 +37,13 @@ const Chat: React.FC = () => {
       event.preventDefault()
     }
 
-    if (username) {
-      setMessages([
-        ...messages,
-        {
-          author: username,
-          message: input,
-        },
-      ]);
-      setInput('');
-    }
+    sendMessage(
+      {
+        author: userParam,
+        text: input,
+      },
+    );
+    setInput('');
   }
 
   return (
@@ -66,17 +65,17 @@ const Chat: React.FC = () => {
       <MessagesList>
         {
           messages.map(message => (
-            <MessageContainer owner={username === message.author}>
+            <MessageContainer owner={userParam === message.author}>
               <MessageContent>
                 {
-                  username !== message.author && (
+                  userParam !== message.author && (
                     <header>
                       <p>{message.author}</p>
                     </header>
                   )
                 }
                 <main>
-                  <p>{message.message}</p>
+                  <p>{message.text}</p>
                 </main>
               </MessageContent>
             </MessageContainer>
