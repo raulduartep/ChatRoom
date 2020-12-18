@@ -11,9 +11,7 @@ const Login: React.FC = () => {
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    localStorage.setItem('ChatRoom@username', username);
-
-    history.push('/chat')
+    history.push(`/chat/${username}`)
 
   }
 
