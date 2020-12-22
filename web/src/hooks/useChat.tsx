@@ -1,33 +1,52 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+import AuthContext from '../contexts/auth';
 
 interface Message {
-  author: string;
-  text: string;
+  message: string;
+  signature: string;
 }
 
-const useChat = (username: string) => {
+interface User {
+  username: string
+}
+
+interface GetChatResponse {
+  messages: Message[];
+  users: User[]
+}
+
+const useChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [users, setUsers] = useState<string[]>([])
+  const [users, setUsers] = useState<User[]>([])
   const socketRef = useRef<Socket>();
+
+  const token = localStorage.getItem('@ChatRoom:token');
+
+  const { api } = useContext(AuthContext)
+
+  useEffect(() => {
+    (async () => {
+      const { data: { users, messages } } = await api.get<GetChatResponse>('/chat');
+
+      setMessages(messages)
+      setUsers(users)
+    })()
+  }, [api])
 
   useEffect(() => {
     socketRef.current = io('http://localhost:3333', {
       query: {
-        username
+        token
       }
     });
 
-    socketRef.current.on('setup', (usernames: string[]) => {
-      setUsers(usernames)
+    socketRef.current.on('new_user', (user: User) => {
+      setUsers((values) => [...values, user])
     })
 
-    socketRef.current.on('new_user', (username: string) => {
-      setUsers((values) => [...values, username])
-    })
-
-    socketRef.current.on('user_disconnect', (username: string) => {
-      setUsers((values) => values.filter((value) => value !== username))
+    socketRef.current.on('user_disconnect', (user: User) => {
+      setUsers((values) => values.filter((value) => value.username !== user.username))
     })
 
     socketRef.current.on('new_message', (message: Message) => {
@@ -38,9 +57,9 @@ const useChat = (username: string) => {
       socketRef.current?.disconnect();
     }
 
-  }, [username])
+  }, [token])
 
-  const sendMessage = (message: Message) => {
+  const sendMessage = (message: string) => {
     socketRef.current?.emit('send_message', message)
   }
 

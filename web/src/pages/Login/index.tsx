@@ -1,18 +1,33 @@
-import React, { FormEvent, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { FormEvent, useContext, useState } from 'react';
+import { Redirect, useLocation } from 'react-router-dom';
 import { Container, Content } from './styles';
 
-const Login: React.FC = () => {
+import AuthContext from '../../contexts/auth';
 
-  const history = useHistory()
+const Login: React.FC = () => {
+  
+  const location = useLocation()
+
+  const { from } = location.state as any || { from: { pathname: '/chat' } }
+
+  const { signed, signIn } = useContext(AuthContext);
 
   const [username, setUsername] = useState('');
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    history.push(`/chat/${username}`)
+    try {
+      await signIn(username)
 
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
+
+  if(signed) {
+    return <Redirect to={from} />
   }
 
   return (

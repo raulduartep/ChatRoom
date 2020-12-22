@@ -1,5 +1,5 @@
-import React, { FormEvent, KeyboardEvent, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { FormEvent, KeyboardEvent, useState } from 'react';
+
 
 import useChat from '../../hooks/useChat';
 
@@ -13,17 +13,12 @@ import {
   UserInputForm
 } from './styles';
 
-interface ChatParams {
-  user: string;
-}
-
-
 const Chat: React.FC = () => {
 
-  const { user: userParam } = useParams<ChatParams>()
-
-  const { messages, sendMessage, users } = useChat(userParam);
+  const { messages, sendMessage, users } = useChat();
   const [input, setInput] = useState('');
+
+  const username = localStorage.getItem('@ChatRoom:username');
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -37,12 +32,7 @@ const Chat: React.FC = () => {
       event.preventDefault()
     }
 
-    sendMessage(
-      {
-        author: userParam,
-        text: input,
-      },
-    );
+    sendMessage(input);
     setInput('');
   }
 
@@ -56,26 +46,26 @@ const Chat: React.FC = () => {
         </header>
         <UsersList>
           {
-            users.map(user => (
-              <li>{user}</li>
+            users.map((user, index) => (
+              <li key={index} >{user.username}</li>
             ))
           }
         </UsersList>
       </UsersContainer>
       <MessagesList>
         {
-          messages.map(message => (
-            <MessageContainer owner={userParam === message.author}>
+          messages.map((message, index) => (
+            <MessageContainer key={index} owner={username === message.signature}>
               <MessageContent>
                 {
-                  userParam !== message.author && (
+                  username !== message.signature && (
                     <header>
-                      <p>{message.author}</p>
+                      <p>{message.signature}</p>
                     </header>
                   )
                 }
                 <main>
-                  <p>{message.text}</p>
+                  <p>{message.message}</p>
                 </main>
               </MessageContent>
             </MessageContainer>
