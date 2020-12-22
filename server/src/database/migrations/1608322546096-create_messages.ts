@@ -18,7 +18,6 @@ export class createMessages1608322546096 implements MigrationInterface {
         {
           name: 'message',
           type: 'text',
-          isUnique: true,
           isNullable: false,
         },
         {

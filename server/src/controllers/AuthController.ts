@@ -6,7 +6,7 @@ import User from '@models/UserModel';
 
 class AuthController {
   static async login(request: Request, response: Response) {
-    const { username } = request.params;
+    const { username } = request.body;
 
     if (!username) {
       return response.status(401).json({
@@ -27,20 +27,14 @@ class AuthController {
         });
       }
 
-      const user = userRepository.create({
-        username,
-      });
-
-      userRepository.save(user);
-
-      const token = AccessToken.create(String(user.id));
-
-      request.socketIO.
+      const token = AccessToken.create({ username });
 
       return response.status(200).json({
         token,
       });
     } catch (error) {
+      console.log(error);
+
       return response.status(400).json({
         error: 'Unexpected error',
       });

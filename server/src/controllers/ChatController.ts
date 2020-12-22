@@ -3,6 +3,8 @@ import { getRepository } from 'typeorm';
 
 import Message from '@models/MessageModel';
 import User from '@models/UserModel';
+import MessageView from '@views/MessageView';
+import UserView from '@views/UserView';
 
 class ChatController {
   static async index(request: Request, response: Response) {
@@ -14,8 +16,8 @@ class ChatController {
       const users = await userRepository.find();
 
       return response.status(200).json({
-        messages,
-        users,
+        messages: MessageView.renderMany(messages),
+        users: UserView.renderMany(users),
       });
     } catch (error) {
       return response.status(400).json({

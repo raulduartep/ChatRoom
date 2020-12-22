@@ -7,6 +7,6 @@ const routes = Router();
 
 routes.post('/login', AuthController.login);
 
-routes.get('/messages', ChatController.index);
+routes.get('/chat', ChatController.index);
 
 export default routes;

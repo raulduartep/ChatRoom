@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
 
 export default {
-  create(username: string) {
+  create(payload: object | string) {
     const token = jwt.sign(
-      { username },
+      payload,
       process.env.SECRET_KEY,
       { expiresIn: '1d' },
     );
@@ -12,7 +12,7 @@ export default {
   },
 
   validate(token: string) {
-    const usernameDecoded = jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+    const payload = jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
       if (err) {
         if (err.name === 'TokenExpiredError') {
           throw new Error('Token expired');
@@ -21,9 +21,9 @@ export default {
         throw new Error('Token invalid');
       }
 
-      return (<any>decoded).username;
+      return decoded;
     });
 
-    return String(usernameDecoded+);
+    return Object(payload);
   },
 };
