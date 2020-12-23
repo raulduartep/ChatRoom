@@ -21,21 +21,10 @@ export class createMessages1608322546096 implements MigrationInterface {
           isNullable: false,
         },
         {
-          name: 'owner_id',
-          type: 'integer',
-        },
-        {
           name: 'signature',
           type: 'varchar',
         },
       ],
-      foreignKeys: [{
-        name: 'MessageUser',
-        columnNames: ['owner_id'],
-        referencedTableName: 'users',
-        referencedColumnNames: ['id'],
-        onUpdate: 'CASCADE',
-      }],
     }));
   }
 

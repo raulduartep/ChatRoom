@@ -1,8 +1,6 @@
 import {
-  Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn,
+  Entity, Column, PrimaryGeneratedColumn,
 } from 'typeorm';
-
-import Message from './MessageModel';
 
 @Entity('users')
 export default class User {
@@ -11,10 +9,4 @@ export default class User {
 
   @Column()
   username: string;
-
-  @OneToMany(() => Message, (message) => message.owner, {
-    cascade: ['insert', 'update'],
-  })
-  @JoinColumn({ name: 'owner_id' })
-  messages: Message[]
 }

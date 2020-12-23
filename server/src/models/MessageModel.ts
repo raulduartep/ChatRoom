@@ -1,7 +1,6 @@
 import {
-  Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn,
+  Entity, Column, PrimaryGeneratedColumn,
 } from 'typeorm';
-import User from './UserModel';
 
 @Entity('messages')
 export default class Images {
@@ -13,8 +12,4 @@ export default class Images {
 
   @Column()
   signature: string;
-
-  @ManyToOne(() => User, (user) => user.messages)
-  @JoinColumn({ name: 'owner_id' })
-  owner: User;
 }

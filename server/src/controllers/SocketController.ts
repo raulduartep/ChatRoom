@@ -7,7 +7,7 @@ import AccessToken from '@utils/AccessToken';
 import UserView from '@views/UserView';
 import MessageView from '@views/MessageView';
 
-interface ExtendedSocket extends SocketIO.Socket{
+interface ExtendedSocket extends SocketIO.Socket {
   username: string
 }
 
@@ -56,53 +56,73 @@ class SocketController {
 
   private handleSendMessage(socket: ExtendedSocket) {
     socket.on('send_message', async (messageText: string) => {
-      const userRepository = getRepository(User);
-      const messageRepository = getRepository(Message);
+      try {
+        const userRepository = getRepository(User);
+        const messageRepository = getRepository(Message);
 
-      const user = await userRepository.findOne({
-        where: {
-          username: socket.username,
-        },
-      });
+        const user = await userRepository.findOne({
+          where: {
+            username: socket.username,
+          },
+        });
 
-      const message = messageRepository.create({
-        message: messageText,
-        owner: user,
-        signature: user.username,
-      });
+        const message = messageRepository.create({
+          message: messageText,
+          owner: user,
+          signature: user.username,
+        });
 
-      await messageRepository.save(message);
+        await messageRepository.save(message);
 
-      this.io.sockets.emit('new_message', MessageView.render(message));
+        this.io.sockets.emit('new_message', MessageView.render(message));
+      } catch (error) {
+        console.log('ww', error);
+      }
     });
   }
 
   private handleDisconnectedSocket(socket: ExtendedSocket) {
     socket.on('disconnect', async () => {
-      const userRepository = getRepository(User);
+      try {
+        const userRepository = getRepository(User);
 
-      const user = await userRepository.findOne({
-        where: {
-          username: socket.username,
-        },
-      });
+        const user = await userRepository.findOne({
+          where: {
+            username: socket.username,
+          },
+        });
 
-      await userRepository.delete(user);
+        await userRepository.delete(user);
 
-      this.io.sockets.emit('user_disconnect', UserView.render(user));
+        this.io.sockets.emit('user_disconnect', UserView.render(user));
+      } catch (error) {
+        console.log('bb', error);
+      }
     });
   }
 
   private async handleNewSocket(socket: ExtendedSocket) {
     const userRepository = getRepository(User);
 
-    const user = userRepository.create({
-      username: socket.username,
-    });
+    try {
+      const user = await userRepository.findOne({
+        where: {
+          username: socket.username,
+        },
+      });
 
-    userRepository.save(user);
+      if (!user) {
+        const newUser = userRepository.create({
+          username: socket.username,
+        });
 
-    socket.broadcast.emit('new_user', UserView.render(user));
+        userRepository.save(newUser);
+
+        this.io.sockets.emit('new_user', UserView.render(newUser));
+      }
+    } catch (error) {
+      console.log('aa', error);
+    }
   }
 }
 
