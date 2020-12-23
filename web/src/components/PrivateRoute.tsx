@@ -3,15 +3,15 @@ import { Route, Redirect, RouteProps } from 'react-router-dom';
 
 import AuthContext from '../contexts/auth';
 
-const PrivateRoute: React.FC<RouteProps> = ({ component, children, ...rest }) => {
+const PrivateRoute: React.FC<RouteProps> = ({ component: Component, children, ...rest }) => {
   
   const { signed } = useContext(AuthContext);
 
   return (
     <Route
       render={(props) => signed
-        ? component
-          ? React.createElement(component, props)
+        ? Component
+          ? <Component {...props} />
           : children
         : <Redirect to={{
           pathname: '/',
